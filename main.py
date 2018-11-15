@@ -3,6 +3,7 @@
 # from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 from tkinter import *
+import preprocessing
 import clustering
 
 def main():
@@ -13,9 +14,15 @@ def main():
     #                     command=lambda: retrieve_input())
     # buttonCommit.pack()
     filename = askopenfilename()
+    data = [{"avain": "arvo"}, {"avain": "arvo2"}]
+
+    pre = preprocessing.Preprocessing(data)
+    pre.removeAttributes(["Att1", "Att3"])
+    pre.normalizeData()
+
 
     c = clustering.Clustering()
-    c.cluster_Kmeans([{"avain": "arvo"}, {"avain": "arvo2"}], k=2)
+    c.cluster_Kmeans(data, k=2)
 
     print(filename)
 

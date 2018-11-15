@@ -5,8 +5,8 @@ class Clustering():
         pass
 
     def cluster_Kmeans(self, data, k):
-        print("Data: %s" % (data))
-        print("K=%d" % (k))
+        print("CLUSTERING/Data: %s" % (data))
+        print("CLUSTERING/K=%d" % (k))
 
     def cluster_DBased(self, data):
         # TODO?
