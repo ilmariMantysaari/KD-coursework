@@ -16,16 +16,17 @@ def main():
     # buttonCommit.pack()
     filename = askopenfilename()
     with open(filename, 'r') as datafile:
-        reader = csv.reader(datafile, delimiter=';')
-        data = list(reader)   
-        # TODO: Get data as a dictionary instead if a list ?
+        reader = csv.DictReader(datafile, delimiter=';')
+        data = []
+        for line in reader:
+            data.append(line)
 
         pre = preprocessing.Preprocessing(data)
-        pre.removeAttributes(["Att1", "Att3"])
+        pre.removeAttributes(["Att1", "Att3", "For example"])
         pre.normalizeData()
 
-        c = clustering.Clustering()
-        c.cluster_Kmeans(data, k=2, dist="manhattan", centre="random")
+        clu = clustering.Clustering()
+        clu.cluster_Kmeans(data, k=2, dist="manhattan", centre="random")
 
         print(filename)
 

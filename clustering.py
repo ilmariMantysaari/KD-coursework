@@ -14,8 +14,8 @@ class Clustering():
     #
     def cluster_Kmeans(self, data, k=3, dist="euclidean", centre="random"):
         print("\nK-MEANS:")
-        print("CLUSTERING/Data: %s" % (data))
-        print("CLUSTERING/K=%d" % (k))
+        # print("CLUSTERING/Data: %s" % (data))
+        # print("CLUSTERING/K=%d" % (k))
 
         # TODO:
         # Arbitrarily pick K cases as initial cluster centres
@@ -24,6 +24,8 @@ class Clustering():
         print(cluster_centres)
         while centres_changed:
             for case in data:
+                for att in case:
+                    print(case[att])
                 # TODO:
                 # Assign each case into a cluster whose centre is closest to the
                 # case in the Euclidean/Manhattan distance sense
@@ -34,6 +36,7 @@ class Clustering():
                 # cluster centres.
                 centres_changed = False
 
+        print()
         return data
 
     # Computes the Euclidean distance between two cases
