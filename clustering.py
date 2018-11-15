@@ -26,26 +26,26 @@ class Clustering():
 
         # TODO: Do this in preprocessing?
         for case in data:
+            # Assigning each case into a cluster, which initially is itself
             case[CLUSTER_NAME] = case[CASE_NAME]
             case[CLUSTER_DISTANCE] = 0
 
         # TODO:
         # Arbitrarily pick K cases as initial cluster centres
-        cluster_centres = [data[0], data[1]]
+        cluster_centres = [data[0], data[4]]
 
         centres_changed = True
         while centres_changed:
             centres_changed = False
             for case in data:
 
-                # Assigning each case into a cluster whose centre is closest to the
-                # case in the Euclidean/Manhattan distance sense
+                # Assigning each case into a cluster whose centre is closest
                 distances = self.getDistances(case, cluster_centres, dist)
                 closests_cluster = min(distances, key=distances.get)
                 if case[CLUSTER_NAME] != closests_cluster:
                     case[CLUSTER_NAME] = closests_cluster
                     case[CLUSTER_DISTANCE] = distances[closests_cluster]
-                    print("Cluster assigned! -> %s" % (case))
+                print("Clusters assigned! -> %s" % (case))
 
                 # TODO:
                 # Compute for each cluster the mean vector of the points
@@ -79,6 +79,8 @@ class Clustering():
     # https://en.wikipedia.org/wiki/Euclidean_distance#Definition
     # sqrt(sum(Qi - Pi)^2)
     def euclideanDist(self, case1, case2):
+        # TODO: This simple line would probably work if attributes were float/int (and not strings...)
+        # return sum([(p-q)**2 for p,q in zip(case1,case2)])
         if len(case1) != len(case2):
             return -1
         euc = 0;
@@ -91,6 +93,7 @@ class Clustering():
     # https://en.wikipedia.org/wiki/Taxicab_geometry#Formal_definition
     # absolute value of sum(Qi-Pi)
     def manhattanDist(self, case1, case2):
+        sum()
         if len(case1) != len(case2):
             return -1
         man = 0;
