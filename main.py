@@ -22,7 +22,7 @@ def main():
 
 
     c = clustering.Clustering()
-    c.cluster_Kmeans(data, k=2)
+    c.cluster_Kmeans(data, k=2, dist="manhattan", centre="random")
 
     print(filename)
 
