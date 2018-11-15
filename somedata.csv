@@ -1,3 +1,6 @@
-Case;Att1;Att2
-Case1;1;2
-Case2;3;4
+Case;Att1;Att2;Att3
+Case1;1;2;3
+Case2;3;4;5
+Case3;1;3;5
+Case4;2;4;6
+Case5;2;5;6

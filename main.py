@@ -5,6 +5,7 @@ from tkinter.filedialog import askopenfilename
 from tkinter import *
 import preprocessing
 import clustering
+import csv
 
 def main():
     # window = Tk()
@@ -14,17 +15,19 @@ def main():
     #                     command=lambda: retrieve_input())
     # buttonCommit.pack()
     filename = askopenfilename()
-    data = [{"avain": "arvo"}, {"avain": "arvo2"}]
+    with open(filename, 'r') as datafile:
+        reader = csv.reader(datafile, delimiter=';')
+        data = list(reader)   
+        # TODO: Get data as a dictionary instead if a list ?
 
-    pre = preprocessing.Preprocessing(data)
-    pre.removeAttributes(["Att1", "Att3"])
-    pre.normalizeData()
+        pre = preprocessing.Preprocessing(data)
+        pre.removeAttributes(["Att1", "Att3"])
+        pre.normalizeData()
 
+        c = clustering.Clustering()
+        c.cluster_Kmeans(data, k=2, dist="manhattan", centre="random")
 
-    c = clustering.Clustering()
-    c.cluster_Kmeans(data, k=2, dist="manhattan", centre="random")
-
-    print(filename)
+        print(filename)
 
 # if __name__ == "__main()__":
 #     main()
