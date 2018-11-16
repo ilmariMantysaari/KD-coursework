@@ -1,21 +1,19 @@
 
 import random
+import copy
 
 # TODO: Probably can't refer to a string 'Case' here (depends on dataset)
 # (These constants should probably be someplace else anyway...)
 CASE_NAME = 'Case'
 CLUSTER_NAME = 'cluster'
-CLUSTER_DISTANCE = 'dist'
-
-
+CLUSTER_DISTANCE = 'dist2clu'
 
 class Clustering():
 
     DISTANCE_EUCLIDEAN = 'eucl'
     DISTANCE_MANHATTAN = 'manh'
-
-    METHOD_RANDOM = 'rand'
-    METHOD_DISTANCE = 'dist'
+    METHOD_RANDOM      = 'rand'
+    METHOD_DISTANCE    = 'dist'
 
     def __init__(self):
         pass
@@ -24,13 +22,15 @@ class Clustering():
     #######################################################
     # K-MEANS CLUSTERING
     #
-    # data   = Dataset to be clustered (dictionary)
+    # data   = Dataset to be clustered (list containing dictionarys)
     # k      = Number of clusters (integer)
     # dist   = Distance function (eucl=Euclidean | manh=Manhattan)
     # centre = Method for selecting the cluster centres (rand=Random | dist=Distance (furthest))
     #
     # updating clusters straight into the given data-object (dict)
     def cluster_Kmeans(self, data, k=3, dist=DISTANCE_EUCLIDEAN, centre_method=METHOD_RANDOM):
+        # Take deepcopy of the data (don't want to edit the original dataset)
+        data = copy.deepcopy(data)
         print("\nK-MEANS CLUSTERING:")
 
         # TODO: Do this in preprocessing?
@@ -41,12 +41,9 @@ class Clustering():
             # Turn attributes into floats:
             for att in self.dict_without_keys(case, [CASE_NAME, CLUSTER_NAME]):
                 case[att] = float(case[att])
-
         
         cluster_centres = self.pickClusterCentres(centre_method, data, k)
-        # cluster_centres = [dict(data[1]), dict(data[2])] 
         
-
         changes_made = True
         while changes_made:
             changes_made = False
@@ -60,7 +57,7 @@ class Clustering():
                     case[CLUSTER_NAME] = closests_cluster
                     case[CLUSTER_DISTANCE] = distances[closests_cluster]
                     changes_made = True
-                print("   Clusters assigned! -> %s" % (case))
+                print("   %s: %s" % (case[CASE_NAME], case))
 
             # Update cluster centres by computing the mean values for each attribute
             if changes_made:
@@ -70,6 +67,8 @@ class Clustering():
                 print("\nNo changes, clustering job done!")
 
         print()
+        return data
+
 
     #######################################################
     # Picking the k cluster centroids with a given method

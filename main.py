@@ -5,6 +5,7 @@ from tkinter.filedialog import askopenfilename
 from tkinter import *
 import preprocessing
 import clustering
+import copy
 import csv
 
 def main():
@@ -26,7 +27,7 @@ def main():
         pre.normalizeData()
 
         clu = clustering.Clustering()
-        clu.cluster_Kmeans(data, k=3, dist="eucl", centre_method="rand")
+        clustered_data_kmeans = clu.cluster_Kmeans(data, k=3, dist="eucl", centre_method="rand")
 
         print(filename)
 
