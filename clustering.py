@@ -1,14 +1,21 @@
 
+import random
+
 # TODO: Probably can't refer to a string 'Case' here (depends on dataset)
 # (These constants should probably be someplace else anyway...)
 CASE_NAME = 'Case'
 CLUSTER_NAME = 'cluster'
 CLUSTER_DISTANCE = 'dist'
 
+
+
 class Clustering():
 
-    EUC = 'euclidean'
-    MAN = 'manhattan'
+    DISTANCE_EUCLIDEAN = 'eucl'
+    DISTANCE_MANHATTAN = 'manh'
+
+    METHOD_RANDOM = 'rand'
+    METHOD_DISTANCE = 'dist'
 
     def __init__(self):
         pass
@@ -17,13 +24,13 @@ class Clustering():
     #######################################################
     # K-MEANS CLUSTERING
     #
-    # data   = Dataset to be clustered
+    # data   = Dataset to be clustered (dictionary)
     # k      = Number of clusters (integer)
-    # dist   = Distance function ("euclidean"/"manhattan")
-    # centre = Method for selecting the cluster centres ("random/furthest")
+    # dist   = Distance function (eucl=Euclidean | manh=Manhattan)
+    # centre = Method for selecting the cluster centres (rand=Random | dist=Distance (furthest))
     #
     # updating clusters straight into the given data-object (dict)
-    def cluster_Kmeans(self, data, k=3, dist=EUC, centre_method='random'):
+    def cluster_Kmeans(self, data, k=3, dist=DISTANCE_EUCLIDEAN, centre_method=METHOD_RANDOM):
         print("\nK-MEANS CLUSTERING:")
 
         # TODO: Do this in preprocessing?
@@ -35,17 +42,10 @@ class Clustering():
             for att in self.dict_without_keys(case, [CASE_NAME, CLUSTER_NAME]):
                 case[att] = float(case[att])
 
-        # TODO:
-        # Arbitrarily pick K cases as initial cluster centres
-        # Use dict(x) to get copys of dictionarys
-        cluster_centres = [dict(data[1]), dict(data[2])] 
-        cluster_centres[0]['Case'] = 'CLUSTER1'
-        cluster_centres[1]['Case'] = 'CLUSTER2'
-        # Remove unneccesary attributes
-        cluster_centres[0].pop('cluster', None)
-        cluster_centres[1].pop('cluster', None)
-        cluster_centres[0].pop('dist', None)
-        cluster_centres[1].pop('dist', None)
+        
+        cluster_centres = self.pickClusterCentres(centre_method, data, k)
+        # cluster_centres = [dict(data[1]), dict(data[2])] 
+        
 
         changes_made = True
         while changes_made:
@@ -56,7 +56,7 @@ class Clustering():
                 distances = self.getDistances(case, cluster_centres, dist)
                 closests_cluster = min(distances, key=distances.get)
                 if case[CLUSTER_NAME] != closests_cluster:
-                    print("   UPDATE (%s != %s)" % (case[CLUSTER_NAME], closests_cluster))
+                    print("   UPDATE %s (%s -> %s)" % (case[CASE_NAME], case[CLUSTER_NAME], closests_cluster))
                     case[CLUSTER_NAME] = closests_cluster
                     case[CLUSTER_DISTANCE] = distances[closests_cluster]
                     changes_made = True
@@ -71,6 +71,23 @@ class Clustering():
 
         print()
 
+    #######################################################
+    # Picking the k cluster centroids with a given method
+    #
+    def pickClusterCentres(self, method, data, k):
+        c = []
+        if method == self.METHOD_RANDOM:
+            random.seed(123)
+            for i in range(k):
+                c.append(dict( data[ random.randint(0, len(data)-1) ] )) 
+                c[i][CASE_NAME] = 'CLUSTER%d' % (i+1)
+                # Remove unneccesary (for clusters) attributes
+                c[i].pop('cluster', None)
+                c[i].pop('dist', None)
+        elif method == self.METHOD_DISTANCE:
+            # TODO ?:
+            pass
+        return c
 
 
     #######################################################
@@ -104,14 +121,12 @@ class Clustering():
         distances = {}
         for cluster in clusters:
 
-            # EUCLIDEAN DISTANCE
-            if dist == self.EUC:
+            if dist == self.DISTANCE_EUCLIDEAN:
                 distances[cluster[CASE_NAME]] = self.euclideanDist( \
                     list(self.dict_without_keys(case,    [CASE_NAME, CLUSTER_NAME, CLUSTER_DISTANCE]).values()), \
                     list(self.dict_without_keys(cluster, [CASE_NAME, CLUSTER_NAME, CLUSTER_DISTANCE]).values()))
 
-            # MANHATTAN DISTANCE
-            elif dist == self.MAN:
+            elif dist == self.DISTANCE_MANHATTAN:
                 distances[cluster[CASE_NAME]] = self.manhattanDist( \
                     list(self.dict_without_keys(case,    [CASE_NAME, CLUSTER_NAME, CLUSTER_DISTANCE]).values()), \
                     list(self.dict_without_keys(cluster, [CASE_NAME, CLUSTER_NAME, CLUSTER_DISTANCE]).values()))

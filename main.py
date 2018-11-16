@@ -26,7 +26,7 @@ def main():
         pre.normalizeData()
 
         clu = clustering.Clustering()
-        clu.cluster_Kmeans(data, k=2, dist="euclidean", centre_method="random")
+        clu.cluster_Kmeans(data, k=3, dist="eucl", centre_method="rand")
 
         print(filename)
 
