@@ -13,6 +13,7 @@ class Clustering():
     def __init__(self):
         pass
 
+
     #######################################################
     # K-MEANS CLUSTERING
     #
@@ -29,6 +30,10 @@ class Clustering():
             # Assigning each case into a cluster, which initially is itself
             case[CLUSTER_NAME] = case[CASE_NAME]
             case[CLUSTER_DISTANCE] = 0
+            for att in self.dict_without_keys(case, [CASE_NAME, CLUSTER_NAME]):
+                case[att] = float(case[att])
+
+        print(data)
 
         # TODO:
         # Arbitrarily pick K cases as initial cluster centres
@@ -65,46 +70,50 @@ class Clustering():
     def getDistances(self, case, clusters, dist):
         distances = {}
         for cluster in clusters:
+
+            # EUCLIDEAN DISTANCE
             if dist == self.EUC:
-                distances[cluster[CASE_NAME]] = self.euclideanDist(self.dict_without_keys(case, [CASE_NAME, CLUSTER_NAME]), self.dict_without_keys(cluster, [CASE_NAME, CLUSTER_NAME]))
+                distances[cluster[CASE_NAME]] = self.euclideanDist( \
+                    list(self.dict_without_keys(case,    [CASE_NAME, CLUSTER_NAME]).values()), \
+                    list(self.dict_without_keys(cluster, [CASE_NAME, CLUSTER_NAME]).values()))
+
+            # MANHATTAN DISTANCE
             elif dist == self.MAN:
-                distances[cluster[CASE_NAME]] = self.manhattanDist(self.dict_without_keys(case, [CASE_NAME, CLUSTER_NAME]), self.dict_without_keys(cluster, [CASE_NAME, CLUSTER_NAME]))
+                distances[cluster[CASE_NAME]] = self.manhattanDist( \
+                    list(self.dict_without_keys(case,    [CASE_NAME, CLUSTER_NAME]).values()), \
+                    list(self.dict_without_keys(cluster, [CASE_NAME, CLUSTER_NAME]).values()))
+
+            # TODO: Error: Given distance function not defined
             else:
-                # TODO: Error: Given distance function not defined
                 pass
+
         return distances
+
 
     #######################################################
     # Computes the EUCLIDEAN DISTANCE between two cases
+    # param: Two lists of attribute values (float)
     # https://en.wikipedia.org/wiki/Euclidean_distance#Definition
-    # sqrt(sum(Qi - Pi)^2)
-    def euclideanDist(self, case1, case2):
-        # TODO: This simple line would probably work if attributes were float/int (and not strings...)
-        # return sum([(p-q)**2 for p,q in zip(case1,case2)])
-        if len(case1) != len(case2):
-            return -1
-        euc = 0;
-        for i, att in enumerate(case1):
-            euc += ((float(case1[att])-float(case2[att]))**2)
-        return euc**(0.5)
+    # sqrt( sum( (p_i-q_i)^2 ) )
+    def euclideanDist(self, values1, values2):
+        return sum([(p-q)**2 for p,q in zip(values1, values2)])
+
 
     #######################################################
     # Computes the MANHATTAN DISTANCE between two cases
+    # param: Two lists of attribute values (float)
     # https://en.wikipedia.org/wiki/Taxicab_geometry#Formal_definition
-    # absolute value of sum(Qi-Pi)
-    def manhattanDist(self, case1, case2):
-        sum()
-        if len(case1) != len(case2):
-            return -1
-        man = 0;
-        for i, att in enumerate(case1):
-            man += abs(float(case1[att])-float(case2[att]))
-        return man
+    # sum(abs(p_i-q_i)
+    def manhattanDist(self, values1, values2):
+        return sum([abs(p-q) for p,q in zip(values1, values2)])
 
 
-
+    #######################################################
+    # Retuns a dictionary with given keys removed
+    #
     def dict_without_keys(self, d, keys):
         return {x: d[x] for x in d if x not in keys}
+
 
     #######################################################
     # DENSITY-BASED CLUSTERING
