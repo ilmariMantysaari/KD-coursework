@@ -1,17 +1,19 @@
-import random
 from copy import deepcopy
+import random
 
 class Clustering():
 
-    CLUSTER_NAME = 'cluster'
-    CLUSTER_DISTANCE = 'dist2clu'
+    CLUSTER_KEY          = 'cluster'
+    CLUSTER_NAME_PREFIX  = 'CLUSTER'
+    CLUSTER_DISTANCE_KEY = 'dist2clu'
+
     DISTANCE_EUCLIDEAN = 'eucl'
     DISTANCE_MANHATTAN = 'manh'
     METHOD_RANDOM      = 'rand'
     METHOD_DISTANCE    = 'dist'
 
     def __init__(self):
-        pass
+        self.__ignored_keys = []
 
 
     #######################################################
@@ -28,27 +30,28 @@ class Clustering():
 
         # Take deepcopy of the data (don't want to edit the original dataset)
         data = deepcopy(data)
-        
-        ignored_keys.append(self.CLUSTER_NAME)
-        ignored_keys.append(self.CLUSTER_DISTANCE)
 
+        # Keys (i.e values) that are ignored in classification computations (distances etc.)
+        self.__ignored_keys.extend(ignored_keys)
+        self.__ignored_keys.extend([self.CLUSTER_KEY, self.CLUSTER_DISTANCE_KEY])
+        
         for i, case in enumerate(data):
             # Assigning each case into a cluster, which initially is itself
-            case[self.CLUSTER_NAME] = "Case%d" % (i)
-            case[self.CLUSTER_DISTANCE] = 0.0
+            case[self.CLUSTER_KEY] = "Case%d" % (i)
+            case[self.CLUSTER_DISTANCE_KEY] = 0.0
             
             # TODO: Do this in preprocessing!
             # Turn attributes into floats:
-            for att in self.dict_without_keys(case, ignored_keys):
+            for att in self.dict_without_keys(case, self.__ignored_keys):
                 case[att] = float(case[att])
-        
-        cluster_centres = self.pickClusterCentres(centre_method, data, k, ignored_keys)
+
+        cluster_centres = self.__pickClusterCentres(centre_method, data, k)
         
         while True:
             # Assign cluster for each case (if not any changes, break the loop)
-            if self.assignClusterCentres(data, cluster_centres, dist, ignored_keys):
+            if self.__assignClusterCentres(data, cluster_centres, dist):
                 # Update cluster centres by computing the mean values for each attribute
-                self.updateClusterCentres(cluster_centres, data, ignored_keys)
+                self.__updateClusterCentres(cluster_centres, data)
                 print("\n   Updated cluster centroids -> New round with a loop...\n")
             else:
                 print("\nNo changes, clustering job done!")
@@ -61,16 +64,16 @@ class Clustering():
     #######################################################
     # Picking the k cluster centroids with a given method
     #
-    def pickClusterCentres(self, method, data, k, ignored_keys):
+    def __pickClusterCentres(self, method, data, k):
         c = []
         if method == self.METHOD_RANDOM:
             random.seed(12345) # Iris seems to work pretty well with seed 12345! (k=3, eucl)
             for i in range(k):
                 c.append(dict( data[ random.randint(0, len(data)-1) ] )) 
                 # Remove unneccesary (for clusters) attributes
-                for key in ignored_keys:
+                for key in self.__ignored_keys:
                     c[i].pop(key, None)
-                c[i][self.CLUSTER_NAME] = 'CLUSTER%d' % (i+1)
+                c[i][self.CLUSTER_KEY] = '%s%d' % (self.CLUSTER_NAME_PREFIX, i+1)
         elif method == self.METHOD_DISTANCE:
             # TODO ?:
             pass
@@ -80,15 +83,15 @@ class Clustering():
     #######################################################
     # Assigns for each data point its closests cluster centre
     #
-    def assignClusterCentres(self, data, cluster_centres, dist, ignored_keys):
+    def __assignClusterCentres(self, data, cluster_centres, dist, ):
         changes_made = False
         for i, case in enumerate(data):
-            distances = self.getDistances(case, cluster_centres, dist, ignored_keys)
+            distances = self.__getDistances(case, cluster_centres, dist)
             closests_cluster = min(distances, key=distances.get)
-            if case[self.CLUSTER_NAME] != closests_cluster:
-                print("   UPDATE Case %d: (%s -> %s)" % (i, case[self.CLUSTER_NAME], closests_cluster))
-                case[self.CLUSTER_NAME] = closests_cluster
-                case[self.CLUSTER_DISTANCE] = distances[closests_cluster]
+            if case[self.CLUSTER_KEY] != closests_cluster:
+                print("   UPDATE Case %d: (%s -> %s)" % (i, case[self.CLUSTER_KEY], closests_cluster))
+                case[self.CLUSTER_KEY] = closests_cluster
+                case[self.CLUSTER_DISTANCE_KEY] = distances[closests_cluster]
                 changes_made = True
             print("   %d: %s" % (i, case))
         return changes_made
@@ -98,22 +101,22 @@ class Clustering():
     # Updates cluster centres 
     # by computing the mean attribute values of cases in each cluster
     #
-    def updateClusterCentres(self, clusters, data, ignored_keys):
+    def __updateClusterCentres(self, clusters, data):
         for cluster in clusters:
             # Initialize every attribute into 0.
-            for att in self.dict_without_keys(cluster, ignored_keys):
+            for att in self.dict_without_keys(cluster, self.__ignored_keys):
                 cluster[att] = 0
             n = 0
             for case in data:
-                if case[self.CLUSTER_NAME] == cluster[self.CLUSTER_NAME]:
+                if case[self.CLUSTER_KEY] == cluster[self.CLUSTER_KEY]:
                     # Add a value of each attribute of each case into a clusters corresponding attribute
-                    for att in self.dict_without_keys(case, ignored_keys):
+                    for att in self.dict_without_keys(case, self.__ignored_keys):
                         cluster[att] += case[att]
                     n += 1
 
             if n > 0:
                 # Divide added/summed attribute values with n (number of cases in a cluster) to get the mean of the values
-                for att in self.dict_without_keys(cluster, ignored_keys):
+                for att in self.dict_without_keys(cluster, self.__ignored_keys):
                     cluster[att] = cluster[att]/n
 
 
@@ -121,19 +124,19 @@ class Clustering():
     # Computes distances between one spesific case and
     # a list of cases. Returns dictionary of distances:
     # {'Cluster name': distance}
-    def getDistances(self, case, clusters, dist, ignored_keys):
+    def __getDistances(self, case, clusters, dist):
         distances = {}
         for cluster in clusters:
 
             if dist == self.DISTANCE_EUCLIDEAN:
-                distances[cluster[self.CLUSTER_NAME]] = self.euclideanDist( \
-                    list(self.dict_without_keys(case,    ignored_keys).values()), \
-                    list(self.dict_without_keys(cluster, ignored_keys).values()))
+                distances[cluster[self.CLUSTER_KEY]] = self.euclideanDist( \
+                    list(self.dict_without_keys(case,    self.__ignored_keys).values()), \
+                    list(self.dict_without_keys(cluster, self.__ignored_keys).values()))
 
             elif dist == self.DISTANCE_MANHATTAN:
-                distances[cluster[self.CLUSTER_NAME]] = self.manhattanDist( \
-                    list(self.dict_without_keys(case,    ignored_keys).values()), \
-                    list(self.dict_without_keys(cluster, ignored_keys).values()))
+                distances[cluster[self.CLUSTER_KEY]] = self.manhattanDist( \
+                    list(self.dict_without_keys(case,    self.__ignored_keys).values()), \
+                    list(self.dict_without_keys(cluster, self.__ignored_keys).values()))
 
             # TODO: Error: Given distance function not defined
             else:
@@ -148,7 +151,6 @@ class Clustering():
     # https://en.wikipedia.org/wiki/Euclidean_distance#Definition
     # sqrt( sum( (p_i-q_i)^2 ) )
     def euclideanDist(self, values1, values2):
-        # TODO: TEST THAT THIS ACTUALLY RETURNS CORRECT VALUES!
         return sum([(p-q)**2 for p,q in zip(values1, values2)])**(0.5)
 
 
@@ -158,7 +160,6 @@ class Clustering():
     # https://en.wikipedia.org/wiki/Taxicab_geometry#Formal_definition
     # sum(abs(p_i-q_i)
     def manhattanDist(self, values1, values2):
-        # TODO: TEST THAT THIS ACTUALLY RETURNS CORRECT VALUES!
         return sum([abs(p-q) for p,q in zip(values1, values2)])
 
 
