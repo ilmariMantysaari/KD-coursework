@@ -26,8 +26,8 @@ def main():
         pre.removeAttributes(["Att1", "Att3", "For example"])
         pre.normalizeData()
 
-        clu = clustering.Clustering()
-        clustered_data_kmeans = clu.cluster_Kmeans(data, k=3, dist='eucl', centre_method='rand', ignored_keys=['Case'])
+        cluster = clustering.Clustering()
+        data_kmeans = cluster.kMeans(data, k=3, dist='eucl', centre_method='rand', ignored_keys=['Case', 'Cluster'])
 
         print(filename)
 
