@@ -148,7 +148,8 @@ class Clustering():
     # https://en.wikipedia.org/wiki/Euclidean_distance#Definition
     # sqrt( sum( (p_i-q_i)^2 ) )
     def euclideanDist(self, values1, values2):
-        return sum([(p-q)**2 for p,q in zip(values1, values2)])
+        # TODO: TEST THAT THIS ACTUALLY RETURNS CORRECT VALUES!
+        return sum([(p-q)**2 for p,q in zip(values1, values2)])**(0.5)
 
 
     #######################################################
@@ -157,6 +158,7 @@ class Clustering():
     # https://en.wikipedia.org/wiki/Taxicab_geometry#Formal_definition
     # sum(abs(p_i-q_i)
     def manhattanDist(self, values1, values2):
+        # TODO: TEST THAT THIS ACTUALLY RETURNS CORRECT VALUES!
         return sum([abs(p-q) for p,q in zip(values1, values2)])
 
 
