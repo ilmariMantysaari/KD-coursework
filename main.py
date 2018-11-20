@@ -6,35 +6,38 @@ from tkinter import *
 import preprocessing
 import clustering
 import copy
-import csv
+import csv     
 
-def main():
-    # window = Tk()
-    # textBox=Text(window, height=2, width=10)
-    # textBox.pack()
-    # buttonCommit=Button(window, height=1, width=10, text="Commit", 
-    #                     command=lambda: retrieve_input())
-    # buttonCommit.pack()
-    filename = askopenfilename()
-    with open(filename, 'r') as datafile:
-        reader = csv.DictReader(datafile, delimiter=';')
-        data = []
-        for line in reader:
-            data.append(line)
+class ClusterGUI:
+    def __init__(self, master):
+        self.master = master
+        self.filename = ""
 
-        pre = preprocessing.Preprocessing(data)
-        pre.removeAttributes(["Att1", "Att3", "For example"])
-        pre.normalizeData()
+        self.filename_select = Button(master, text="Select file", command=self.get_filename)
+        self.filename_select.pack()
 
-        cluster = clustering.Clustering()
-        data_kmeans = cluster.kMeans(data, k=3, dist='eucl', centre_method='rand', ignored_keys=['Case', 'Cluster'])
+        self.cluster_button = Button(master, text="Cluster", command=self.clustering)
+        self.cluster_button.pack()
 
-        print(filename)
+    def get_filename(self):
+        self.filename = askopenfilename()
 
-# if __name__ == "__main()__":
-#     main()
-main()
+    def clustering(self):
+        with open(self.filename, 'r') as datafile:
+            reader = csv.DictReader(datafile, delimiter=';')
+            data = []
+            for line in reader:
+                data.append(line)
 
+            pre = preprocessing.Preprocessing(data)
+            pre.removeAttributes(["Att1", "Att3", "For example"])
+            pre.normalizeData()
 
-# clusterien määrä
-# 
+            cluster = clustering.Clustering()
+            data_kmeans = cluster.kMeans(data, k=3, dist='eucl', centre_method='rand', ignored_keys=['Case', 'Cluster'])
+
+            print(self.filename)
+
+root = Tk()
+gui = ClusterGUI(root)
+root.mainloop()
