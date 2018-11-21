@@ -2,7 +2,7 @@
 # Create a new instance for each clustering job.
 import copy
 import datetime
-import matplotlib.pyplot as plot
+import matplotlib.pyplot as plt
 
 
 # Utility method for finding unique cluster names from data
@@ -19,9 +19,9 @@ class ClusterImageWriter():
 
     # INIT
     # Set some variables here for file names
-    def __init__(self, fileName, suffix=datetime.datetime.now().strftime('_%Y_%m_%d__%H_%M_%S')):
-        self.id = fileName + suffix
-        self.counter = 1
+    def __init__(self, fileName, suffix=datetime.datetime.now().strftime('%Y_%m_%d__%H_%M_%S')):
+        self.id = fileName + '_' + suffix
+        self.imgCounter = 1
 
     # WRITE SINGLE IMAGE
     #
@@ -36,8 +36,21 @@ class ClusterImageWriter():
     #              https://matplotlib.org/examples/color/named_colors.html
     def writeImage(self, data, clusterKey, xAttr, xLabel, yAttr, yLabel, colors=DEFAULT_COLORS):
         # Don't edit original data
-        dataClone = copy.deepcopy(data)
-        clusterNames = parseClusterNames(dataClone, clusterKey)
+        dataC = copy.deepcopy(data)
+        clusterNames = parseClusterNames(dataC, clusterKey)
+        colorI = 0
+        # Iterate through cluster names so that each cluster gets different color
+        for name in clusterNames:
+            clusterCases = filter(lambda case: case[clusterKey] == name, dataC)
+            safeColorI = colorI % len(colors)
+            for case in clusterCases:
+                plt.plot(case[xAttr], case[yAttr], color=colors[safeColorI], marker='o', markersize=5)
+            colorI = colorI + 1
+        fileName = self.id + '_' + str(self.imgCounter) + ".png"
+        plt.savefig(fileName, format='png')
+        self.imgCounter = self.imgCounter + 1
+        # Todo: remove show call from finished solution
+        plt.show()
         return
 
     # COMBINE ALL IMAGES MADE BY THIS WRITER TO A GIF

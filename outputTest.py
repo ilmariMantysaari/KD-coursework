@@ -32,11 +32,11 @@ class TestClusterOutput(unittest.TestCase):
         self.assertEqual(output.parseClusterNames(DATA_3, 'c'), ['cluster1', 'cluster2', 'cluster3', 'cluster4'])
 
     def test_ClusterImageWriterInit(self):
-        writer = output.ClusterImageWriter('test_output_file', '_suffix')
+        writer = output.ClusterImageWriter('test_output_file', 'suffix')
         self.assertEqual(writer.id, 'test_output_file_suffix')
 
     def test_writeImage(self):
-        writer = output.ClusterImageWriter('test_output_file', '_suffix')
-        writer.writeImage(DATA_1, 'cluster', 'a', 'a', 'b', 'b')
+        writer = output.ClusterImageWriter('test_output_file', 'suffix')
+        writer.writeImage(DATA_3, 'c', 'a', 'a', 'b', 'b')
         outputFile = pathlib.Path('test_output_file_suffix_1.png')
         self.assertTrue(outputFile.is_file())
