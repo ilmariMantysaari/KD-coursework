@@ -24,7 +24,7 @@ def main():
 
         pre = preprocessing.Preprocessing(data)
         pre.removeAttributes(["Att1", "Att3", "For example"])
-        pre.normalizeData()
+        data = pre.normalizeData()
 
         cluster = clustering.Clustering()
         data_kmeans = cluster.kMeans(data, k=3, dist='eucl', centre_method='rand', ignored_keys=['Case', 'Cluster'])
