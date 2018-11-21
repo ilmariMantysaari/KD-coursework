@@ -1,6 +1,5 @@
 import unittest
 import output
-import datetime
 import pathlib
 
 DATA_1 = [
