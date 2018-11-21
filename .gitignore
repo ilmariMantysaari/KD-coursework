@@ -47,6 +47,9 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# Test output image
+test_output_file_suffix_1.png
+
 # Translations
 *.mo
 *.pot
