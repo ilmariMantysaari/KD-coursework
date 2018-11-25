@@ -31,34 +31,41 @@ class Clustering():
         # Take deepcopy of the data (don't want to edit the original dataset)
         data = deepcopy(data)
 
+        dataCollector = []
+        centerCollector = []
+
         # Keys (i.e values) that are ignored in classification computations (distances etc.)
         self.__ignored_keys.extend(ignored_keys)
         self.__ignored_keys.extend([self.CLUSTER_KEY, self.CLUSTER_DISTANCE_KEY])
-        
+
         for i, case in enumerate(data):
             # Assigning each case into a cluster, which initially is itself
             case[self.CLUSTER_KEY] = "Case%d" % (i)
             case[self.CLUSTER_DISTANCE_KEY] = 0.0
-            
+
             # TODO: Do this in preprocessing!
             # Turn attributes into floats:
             for att in self.dict_without_keys(case, self.__ignored_keys):
                 case[att] = float(case[att])
 
         cluster_centres = self.__pickClusterCentres(centre_method, data, k)
-        
+        centerCollector.append(deepcopy(cluster_centres))
+
         while True:
             # Assign cluster for each case (if not any changes, break the loop)
             if self.__assignClusterCentres(data, cluster_centres, dist):
                 # Update cluster centres by computing the mean values for each attribute
                 self.__updateClusterCentres(cluster_centres, data)
+                centerCollector.append(deepcopy(cluster_centres))
+                dataCollector.append(deepcopy(data))
                 print("\n   Updated cluster centroids -> New round with a loop...\n")
             else:
+                dataCollector.append(deepcopy(data))
                 print("\nNo changes, clustering job done!")
                 break
 
         print()
-        return data
+        return (dataCollector, centerCollector)
 
 
     #######################################################
@@ -69,7 +76,7 @@ class Clustering():
         if method == self.METHOD_RANDOM:
             random.seed(12345) # Iris seems to work pretty well with seed 12345! (k=3, eucl)
             for i in range(k):
-                c.append(dict( data[ random.randint(0, len(data)-1) ] )) 
+                c.append(dict( data[ random.randint(0, len(data)-1) ] ))
                 # Remove unneccesary (for clusters) attributes
                 for key in self.__ignored_keys:
                     c[i].pop(key, None)
@@ -91,14 +98,14 @@ class Clustering():
             if case[self.CLUSTER_KEY] != closests_cluster:
                 print("   UPDATE Case %d: (%s -> %s)" % (i, case[self.CLUSTER_KEY], closests_cluster))
                 case[self.CLUSTER_KEY] = closests_cluster
-                case[self.CLUSTER_DISTANCE_KEY] = distances[closests_cluster]
                 changes_made = True
+            case[self.CLUSTER_DISTANCE_KEY] = distances[closests_cluster]
             print("   %d: %s" % (i, case))
         return changes_made
 
 
     #######################################################
-    # Updates cluster centres 
+    # Updates cluster centres
     # by computing the mean attribute values of cases in each cluster
     #
     def __updateClusterCentres(self, clusters, data):
@@ -176,4 +183,3 @@ class Clustering():
     def cluster_DBased(self, data):
         # TODO?
         pass
-
