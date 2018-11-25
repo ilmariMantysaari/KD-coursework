@@ -60,8 +60,9 @@ DATA_LIST_CENTERS = [
 OUTPUT_1 = 'test_output_file_suffix_1.png'
 OUTPUT_LIST_1 = 'test_output_file_list_1.png'
 OUTPUT_LIST_2 = 'test_output_file_list_2.png'
+OUTPUT_GIF = 'test_outpu_file_list_combined.gif'
 
-OUTPUT_FILES = [OUTPUT_1, OUTPUT_LIST_1, OUTPUT_LIST_2]
+OUTPUT_FILES = [OUTPUT_1, OUTPUT_LIST_1, OUTPUT_LIST_2, OUTPUT_GIF]
 
 
 class TestClusterOutput(unittest.TestCase):
@@ -94,3 +95,9 @@ class TestClusterOutput(unittest.TestCase):
         outputFile2 = pathlib.Path(OUTPUT_LIST_2)
         self.assertTrue(outputFile1.is_file())
         self.assertTrue(outputFile2.is_file())
+
+    def test_writeGif(self):
+        writer = output.ClusterImageWriter('test_output_file', 'list')
+        writer.writeImages(DATA_LIST, DATA_LIST_CENTERS, 'clust', 'dist', 'a', 'b')
+        outputGif = pathlib.Path(OUTPUT_GIF)
+        self.assertTrue(outputGif.is_file())

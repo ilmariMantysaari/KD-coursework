@@ -2,7 +2,10 @@
 # Create a new instance for each clustering job.
 import copy
 import datetime
+import glob
+import imageio
 import matplotlib.pyplot as plt
+import os
 
 
 # Utility method for finding unique cluster names from data
@@ -74,10 +77,11 @@ class ClusterImageWriter():
             colorI = colorI + 1
         fileName = self.id + '_' + str(imgNum) + ".png"
         plt.savefig(fileName, format='png')
-        # Todo: remove show call from finished solution
-        plt.show()
         return
 
     # COMBINE ALL IMAGES MADE BY THIS WRITER TO A GIF
-    def writeGif(delay=DEFAULT_GIF_DELAY):
+    def writeGif(self, delay=DEFAULT_GIF_DELAY):
+        imgFiles = glob.glob(self.id + "*.png")
+        images = map(lambda file: imageio.imread(file), imgFiles)
+        imageio.mimsave(self.id + "_combined.gif", images, duration=1.5)
         return

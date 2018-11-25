@@ -51,6 +51,7 @@ coverage.xml
 test_output_file_suffix_1.png
 test_output_file_list_1.png
 test_output_file_list_2.png
+test_output_file_list_combined.gif
 
 # Translations
 *.mo
