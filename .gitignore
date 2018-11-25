@@ -52,6 +52,8 @@ test_output_file_suffix_1.png
 test_output_file_list_1.png
 test_output_file_list_2.png
 test_output_file_list_combined.gif
+iris.csv_output*.png
+iris.csv_output_combined.gif
 
 # Translations
 *.mo
