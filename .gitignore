@@ -49,6 +49,8 @@ coverage.xml
 
 # Test output image
 test_output_file_suffix_1.png
+test_output_file_list_1.png
+test_output_file_list_2.png
 
 # Translations
 *.mo

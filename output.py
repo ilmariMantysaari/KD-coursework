@@ -23,18 +23,30 @@ class ClusterImageWriter():
         self.id = fileName + '_' + suffix
         self.imgCounter = 1
 
-    # WRITE SINGLE IMAGE
+    # WRITE MULTIPLE IMAGES FOR DIFFERENT CLUSTER PHASES
     #
-    # data       = Dataset to be rendered (list containing dictionarys)
+    # dataList   = List of clustered data in different phases of clustering. Check outputTest.py for example.
     # clusterKey = Key for cluster attribute in each case
-    # xAttr      = Key for x-axis attribute in the resulting image
-    # xLabel     = Label for x-axis in the resulting image
-    # yAttr      = Key for y-axis attribute in the resulting image
-    # yLabel     = Label for y-axis in the resulting image
+    # xAttr      = Key for x-axis attribute in the resulting image. Also the label for x-axis
+    # yAttr      = Key for y-axis attribute in the resulting image. Also the label for y-axis
     # colors     = [Optional] Color codes for clusters. If there's more clusters
     #              than color codes, the list is started from the beginning.
     #              https://matplotlib.org/examples/color/named_colors.html
-    def writeImage(self, data, clusterKey, xAttr, xLabel, yAttr, yLabel, colors=DEFAULT_COLORS):
+    def writeImages(self, dataList, clusterKey, xAttr, yAttr, colors=DEFAULT_COLORS):
+        for data in dataList:
+            self.writeImage(data, clusterKey, xAttr, yAttr, self.imgCounter, colors)
+            self.imgCounter = self.imgCounter + 1
+        return
+
+    # WRITE SINGLE IMAGE
+    #
+    # data       = Dataset to be rendered. Represents one phase in clustering
+    # clusterKey = Key for cluster attribute in each case
+    # xAttr      = Key for x-axis attribute in the resulting image. Also the label for x-axis
+    # yAttr      = Key for y-axis attribute in the resulting image. Also the label for y-axis
+    # colors     = Color codes for clusters
+    # imgNum     = Numeric counter appended to outputted file's name
+    def writeImage(self, data, clusterKey, xAttr, yAttr, imgNum, colors=DEFAULT_COLORS):
         # Don't edit original data
         dataC = copy.deepcopy(data)
         clusterNames = parseClusterNames(dataC, clusterKey)
@@ -46,9 +58,8 @@ class ClusterImageWriter():
             for case in clusterCases:
                 plt.plot(case[xAttr], case[yAttr], color=colors[safeColorI], marker='o', markersize=5)
             colorI = colorI + 1
-        fileName = self.id + '_' + str(self.imgCounter) + ".png"
+        fileName = self.id + '_' + str(imgNum) + ".png"
         plt.savefig(fileName, format='png')
-        self.imgCounter = self.imgCounter + 1
         # Todo: remove show call from finished solution
         plt.show()
         return
