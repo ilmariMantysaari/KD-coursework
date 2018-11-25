@@ -56,6 +56,7 @@ class Clustering():
             if self.__assignClusterCentres(data, cluster_centres, dist):
                 # Update cluster centres by computing the mean values for each attribute
                 self.__updateClusterCentres(cluster_centres, data)
+                # Collect data and center points for each phase
                 centerCollector.append(deepcopy(cluster_centres))
                 dataCollector.append(deepcopy(data))
                 print("\n   Updated cluster centroids -> New round with a loop...\n")
