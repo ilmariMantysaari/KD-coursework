@@ -7,7 +7,6 @@ import preprocessing
 import clustering
 import copy
 import csv
-import output
 
 class ClusterGUI:
     def __init__(self, master):
@@ -35,12 +34,7 @@ class ClusterGUI:
             pre.normalizeData()
 
             cluster = clustering.Clustering()
-            datasCtrsTuple = cluster.kMeans(data, k=3, dist='eucl', centre_method='rand', ignored_keys=['Case', 'Cluster'])
-
-            writer = output.ClusterImageWriter(self.filename)
-            # Todo: use attributes keys set in UI
-            writer.writeImages(datasCtrsTuple[0], datasCtrsTuple[1], 'cluster', 'dist2clu', 'petal_width', 'petal_length')
-
+            data_kmeans = cluster.kMeans(data, k=3, dist='eucl', centre_method='rand', ignored_keys=['Case', 'Cluster'])
 
             print(self.filename)
 
