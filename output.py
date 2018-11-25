@@ -18,8 +18,8 @@ def parseClusterNames(data, clusterKey):
 class ClusterImageWriter():
     DEFAULT_COLORS = ['firebrick', 'gray', 'blue', 'plum', 'olive', 'dodgerblue', 'fuchsia', 'green', 'aqua', 'midnightblue']
     DEFAULT_GIF_DELAY = 1
-    MAX_MARKER_SIZE = 15
-    MIN_MARKER_SIZE = 5
+    MAX_MARKER_SIZE = 13
+    MIN_MARKER_SIZE = 3
     CENTER_SIZE = 7
 
     # INIT
