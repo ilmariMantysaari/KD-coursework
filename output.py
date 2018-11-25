@@ -25,6 +25,7 @@ class ClusterImageWriter():
     # INIT
     # Set some variables here for file names
     def __init__(self, fileName, suffix=datetime.datetime.now().strftime('%Y_%m_%d__%H_%M_%S')):
+        self.fileName = fileName
         self.id = fileName + '_' + suffix
         self.imgCounter = 1
 
@@ -74,12 +75,18 @@ class ClusterImageWriter():
             # Draw cluster center last
             plt.plot(center[xAttr], center[yAttr], color=colors[safeColorI], marker='D', markerSize=self.CENTER_SIZE, markeredgecolor='black')
             colorI = colorI + 1
+
+        # Output a file and clear the figure
         fileName = self.id + '_' + str(imgNum) + ".png"
+        plt.title("'" + self.fileName + "' - phase " + str(self.imgCounter))
+        plt.ylabel(yAttr)
+        plt.xlabel(xAttr)
         plt.savefig(fileName, format='png')
+        plt.clf()
         return
 
     # COMBINE ALL IMAGES MADE BY THIS WRITER TO A GIF
-    def writeGif(self, delay=DEFAULT_GIF_DELAY):
+    def writeGif(self):
         imgFiles = glob.glob(self.id + "*.png")
         images = map(lambda file: imageio.imread(file), imgFiles)
         imageio.mimsave(self.id + "_combined.gif", images, duration=1.5)
