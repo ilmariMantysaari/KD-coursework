@@ -5,7 +5,6 @@ import datetime
 import glob
 import imageio
 import matplotlib.pyplot as plt
-import os
 
 
 # Utility method for finding unique cluster names from data
