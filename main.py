@@ -4,7 +4,9 @@
 from tkinter.filedialog import askopenfilename
 from tkinter import *
 import preprocessing
-import clustering
+from clustering.kMeans import kMeans
+from clustering.DBSCAN import DBSCAN
+import pprint
 import copy
 import csv
 
@@ -33,8 +35,14 @@ class ClusterGUI:
             pre.removeAttributes(["Att1", "Att3", "For example"])
             pre.normalizeData()
 
-            cluster = clustering.Clustering()
-            data_kmeans = cluster.kMeans(data, k=3, dist='eucl', centre_method='rand', ignored_keys=['Case', 'Cluster'])
+            k_means = kMeans()
+            data_kmeans = k_means.cluster(data, k=3, dist='eucl', centreMethod='rand', filterKeys=['Case', 'class'])
+            
+            pp = pprint.PrettyPrinter(indent=2)
+            pp.pprint(data_kmeans)
+            # Cluster centres and clustered data listed in every iteration:
+            #pp.pprint(k_means.iterCentres)
+            #pp.pprint(k_means.iterData)
 
             print(self.filename)
 
