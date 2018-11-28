@@ -1,6 +1,6 @@
 
 class Clustering():
-    DEVMODE = False
+    DEVMODE = True
 
     CLUSTER_KEY          = 'cluster'
     CLUSTER_NAME_PREFIX  = 'CLUSTER'

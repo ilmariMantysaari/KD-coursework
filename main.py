@@ -32,14 +32,14 @@ class ClusterGUI:
                 data.append(line)
 
             pre = preprocessing.Preprocessing(data)
-            pre.removeAttributes(["Att1", "Att3", "For example"])
-            pre.normalizeData()
+            #pre.removeAttributes(["Att1", "Att3", "For example"])
+            normalized_data = pre.normalizeData()
 
             k_means = kMeans()
-            data_kmeans = k_means.cluster(data, k=3, dist='eucl', centreMethod='rand', filterKeys=['Case', 'class'])
+            data_kmeans = k_means.cluster(normalized_data, k=3, dist='eucl', centreMethod='rand', filterKeys=['Case', 'class'])
             
             pp = pprint.PrettyPrinter(indent=2)
-            pp.pprint(data_kmeans)
+            #pp.pprint(data_kmeans)
             # Cluster centres and clustered data listed in every iteration:
             #pp.pprint(k_means.iterCentres)
             #pp.pprint(k_means.iterData)

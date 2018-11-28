@@ -45,8 +45,8 @@ class kMeans(Clustering):
 
             # TODO: Do this in preprocessing!
             # Turn attributes into floats:
-            for att in self.dictionaryWithoutKeys(case, self.filterKeys):
-                case[att] = float(case[att])
+            # for att in self.dictionaryWithoutKeys(case, self.filterKeys):
+            #     case[att] = float(case[att])
 
         clusterCentres = self.selectClusterCentres(centreMethod, data, k)
         centerCollector.append(deepcopy(clusterCentres))
@@ -62,7 +62,7 @@ class kMeans(Clustering):
                 if self.DEVMODE: print("\n   Updated cluster centroids -> New round with a loop...\n")
             else:
                 dataCollector.append(deepcopy(data))
-                if self.DEVMODE: print("\nNo changes, clustering job done!")
+                if self.DEVMODE: print("\nNo changes, clustering job done! It took %d iterations after initial round." % (len(dataCollector)-1))
                 break
 
         if self.DEVMODE: print()
@@ -105,7 +105,8 @@ class kMeans(Clustering):
                 case[self.CLUSTER_KEY] = closestsCluster
                 changesMade = True
             case[self.CLUSTER_DISTANCE_KEY] = distances[closestsCluster]
-            if self.DEVMODE: print("   %d: %s" % (i, case))
+            if self.DEVMODE: print("   Case %d: %s (dist %.3f)" % (i, case[self.CLUSTER_KEY], case[self.CLUSTER_DISTANCE_KEY]))
+            # if self.DEVMODE: print("   %d: %s" % (i, case))
         return changesMade
 
 
