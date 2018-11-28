@@ -105,7 +105,7 @@ class kMeans(Clustering):
                 case[self.CLUSTER_KEY] = closestsCluster
                 changesMade = True
             case[self.CLUSTER_DISTANCE_KEY] = distances[closestsCluster]
-            if self.DEVMODE: print("   Case %d: %s (dist %.3f)" % (i, case[self.CLUSTER_KEY], case[self.CLUSTER_DISTANCE_KEY]))
+            if self.DEVMODE: print("   Case %d: %s (%s %.3f)" % (i, case[self.CLUSTER_KEY], self.CLUSTER_DISTANCE_KEY, case[self.CLUSTER_DISTANCE_KEY]))
             # if self.DEVMODE: print("   %d: %s" % (i, case))
         return changesMade
 

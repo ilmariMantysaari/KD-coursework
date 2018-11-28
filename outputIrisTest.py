@@ -1,5 +1,5 @@
 import csv
-from clustering.Clustering import clustering
+from clustering.kMeans import kMeans
 import glob
 import output
 import os
@@ -26,11 +26,11 @@ class TestClusterOutput(unittest.TestCase):
                 data.append(line)
 
             pre = preprocessing.Preprocessing(data)
-            pre.normalizeData()
+            normalizedData = pre.normalizeData()
 
             k_means = kMeans()
-            data_kmeans = k_means.cluster(data, k=3, dist='eucl', centreMethod='rand', filterKeys=['Case', 'class'])
+            data_kmeans = k_means.cluster(normalizedData, k=3, dist='eucl', centreMethod='rand', filterKeys=['Case', 'class'])
 
             writer = output.ClusterImageWriter('iris.csv', 'output')
-            writer.writeImages(k_means.iterCentres, k_means.iterData, 'cluster', 'dist2clu', 'petal_width', 'petal_length')
+            writer.writeImages(k_means.iterData, k_means.iterCentres, 'cluster', 'dist2clu', 'petal_width', 'petal_length')
             writer.writeGif()
