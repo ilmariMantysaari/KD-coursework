@@ -18,3 +18,7 @@ Output module has some tests for it. To run them write:
 ```
 python -m unittest outputTest.py
 ```
+See what kind of images clustering of the iris data produces:
+```
+python -m unittest ouputIrisTest.py
+```

@@ -4,7 +4,9 @@
 from tkinter.filedialog import askopenfilename
 from tkinter import *
 import preprocessing
-import clustering
+from clustering.kMeans import kMeans
+from clustering.DBSCAN import DBSCAN
+import pprint
 import copy
 import csv     
 
@@ -64,16 +66,3 @@ class ClusterGUI:
 root = Tk()
 gui = ClusterGUI(root)
 root.mainloop()
-
-# valinnat clusteringin parametreille
-    # checkboxit vivuille
-    # näytä tiedoston nimi
-    # k:n valinta
-# mahd. valinta poistetaville attribuuteille
-# clustereiden näyttö
-    # clusteri graafi
-# clustereista tietoa
-    # määrä
-    # caset/clusteri
-    # centroidit
-
