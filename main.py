@@ -38,6 +38,9 @@ class ClusterGUI:
             k_means = kMeans()
             data_kmeans = k_means.cluster(normalized_data, k=3, dist='eucl', centreMethod='rand', filterKeys=['Case', 'class'])
             
+            dbscan = DBSCAN()
+            data_dbscan = dbscan.cluster(normalized_data, eps=1.2, MinPts=3, dist='eucl', filterKeys=['Case', 'class'])
+            
             pp = pprint.PrettyPrinter(indent=2)
             #pp.pprint(data_kmeans)
             # Cluster centres and clustered data listed in every iteration:
