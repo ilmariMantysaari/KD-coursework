@@ -1,6 +1,6 @@
 
 class Clustering():
-    DEVMODE = True
+    DEVMODE = False
 
     CLUSTER_KEY          = 'cluster'
     CLUSTER_NAME_PREFIX  = 'CLUSTER'
@@ -57,3 +57,13 @@ class Clustering():
                 pass
 
         return distances
+
+    def distance(self, case1, case2, dist):
+        if dist == self.DISTANCE_EUCLIDEAN:
+            return self.euclideanDist( \
+                list(self.dictionaryWithoutKeys(case1, self.filterKeys).values()), \
+                list(self.dictionaryWithoutKeys(case2, self.filterKeys).values()))
+        elif dist == self.DISTANCE_MANHATTAN:
+            return self.manhattanDist( \
+                list(self.dictionaryWithoutKeys(case1, self.filterKeys).values()), \
+                list(self.dictionaryWithoutKeys(case2, self.filterKeys).values()))

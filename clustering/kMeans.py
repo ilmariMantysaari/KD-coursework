@@ -26,9 +26,9 @@ class kMeans(Clustering):
     # centreMethod = Method for selecting the cluster centres (rand=Random | dist=Distance (furthest))
     # filterKeys   = keys to be filtered out before computing distances
     #
+    # returns the same data set with one extra attribute namely 'cluster'
+    #
     def cluster(self, data, k=3, dist=DISTANCE_EUCLIDEAN, centreMethod=METHOD_RANDOM, filterKeys=[]):
-        if self.DEVMODE: print("\nK-MEANS CLUSTERING:")
-
         # Take deepcopy of the data (don't want to edit the original dataset)
         data = deepcopy(data)
         dataCollector = []
@@ -39,14 +39,8 @@ class kMeans(Clustering):
         self.filterKeys.extend([self.CLUSTER_KEY, self.CLUSTER_DISTANCE_KEY])
 
         for i, case in enumerate(data):
-            # Assigning each case into a cluster, which initially is itself
-            case[self.CLUSTER_KEY] = "Case%d" % (i)
+            case[self.CLUSTER_KEY] = ''
             case[self.CLUSTER_DISTANCE_KEY] = 0.0
-
-            # TODO: Do this in preprocessing!
-            # Turn attributes into floats:
-            # for att in self.dictionaryWithoutKeys(case, self.filterKeys):
-            #     case[att] = float(case[att])
 
         clusterCentres = self.selectClusterCentres(centreMethod, data, k)
         centerCollector.append(deepcopy(clusterCentres))
@@ -69,7 +63,8 @@ class kMeans(Clustering):
 
         self.iterCentres = centerCollector
         self.iterData = dataCollector
-
+        
+        print("K-Means done!")
         return data
 
 
@@ -95,7 +90,7 @@ class kMeans(Clustering):
     #######################################################
     # Assigns for each data point its closests cluster centre
     #
-    def assignClusterCentres(self, data, clusterCentres, dist, ):
+    def assignClusterCentres(self, data, clusterCentres, dist):
         changesMade = False
         for i, case in enumerate(data):
             distances = self.getDistances(case, clusterCentres, dist)

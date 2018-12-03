@@ -52,11 +52,20 @@ class ClusterGUI:
                 data.append(line)
 
             pre = preprocessing.Preprocessing(data)
-            pre.removeAttributes(["Att1", "Att3", "For example"])
-            pre.normalizeData()
+            #pre.removeAttributes(["Att1", "Att3", "For example"])
+            normalized_data = pre.normalizeData()
 
-            cluster = clustering.Clustering()
-            data_kmeans = cluster.kMeans(data, k=3, dist=self.dist, centre_method=self.method, ignored_keys=['Case', 'Cluster'])
+            k_means = kMeans()
+            data_kmeans = k_means.cluster(normalized_data, k=3, dist='eucl', centreMethod='rand', filterKeys=['Case', 'class'])
+            
+            dbscan = DBSCAN()
+            data_dbscan = dbscan.cluster(normalized_data, eps=1.2, MinPts=3, dist='eucl', filterKeys=['Case', 'class'])
+            
+            pp = pprint.PrettyPrinter(indent=2)
+            #pp.pprint(data_kmeans)
+            # Cluster centres and clustered data listed in every iteration:
+            #pp.pprint(k_means.iterCentres)
+            #pp.pprint(k_means.iterData)
 
             print(self.filename)
 
