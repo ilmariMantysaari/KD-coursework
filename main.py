@@ -131,6 +131,7 @@ class ClusterGUI:
                     dist=self.dist.get(),
                     centreMethod=self.method.get(),
                     filterKeys=['Case', 'class'])
+
             else:
                 clustered_data = dbscan.cluster(normalized_data, eps=1.2,
                     MinPts=self.min_pts_entry.get(),
@@ -139,18 +140,33 @@ class ClusterGUI:
             
             pp = pprint.PrettyPrinter(indent=2)
             pp.pprint(clustered_data)
+
+            with open(self.algorithm.get()+".csv", "w") as outfile:
+                keysExist = False
+                csvwriter = csv.writer(outfile)
+                for line in clustered_data:
+                    keys = []
+                    values = []
+                    for key, value in line.items():
+                        keys.append(key)
+                        values.append(value)
+
+                    if not keysExist:
+                        csvwriter.writerow(keys)
+                        keysExist = True
+                    csvwriter.writerow(values)
             # Cluster centres and clustered data listed in every iteration:
             #pp.pprint(k_means.iterCentres)
             #pp.pprint(k_means.iterData)
 
-            clustWriter = ClusterImageWriter("newfile")
-            clustWriter.writeImage(
-                k_means.iterData[0], 
-                k_means.iterCentres[0],
-                'cluster',
-                'dist2clu',
-                "sepal_length", "sepal_width",
-                1)
+            #clustWriter = ClusterImageWriter("newfile")
+            #clustWriter.writeImage(
+            #    k_means.iterData[0], 
+            #    k_means.iterCentres[0],
+            #    'cluster',
+            #    'dist2clu',
+            #    "sepal_length", "sepal_width",
+            #    1)
 
 root = Tk()
 gui = ClusterGUI(root)

@@ -75,7 +75,7 @@ class kMeans(Clustering):
         c = []
         if method == self.METHOD_RANDOM:
             random.seed(12345) # Iris seems to work pretty well with seed 12345! (k=3, eucl)
-            for i in range(k):
+            for i in range(int(k)):
                 c.append(dict( data[ random.randint(0, len(data)-1) ] ))
                 # Remove unneccesary (for clusters) attributes
                 for key in self.filterKeys:

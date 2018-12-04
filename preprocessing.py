@@ -17,7 +17,7 @@ class Preprocessing():
         # niin ko. attribuutit jätetään huomioimatta etäisyyksiä laskiessa.
 
     def normalizeData(self):
-        print("PREPROCESSING/Normalize: %s" % self.data)
+        #print("PREPROCESSING/Normalize: %s" % self.data)
         
         #Dictionary kullekin attribuutille
         attributes = {}
