@@ -11,6 +11,13 @@ import copy
 import csv
 from output import ClusterImageWriter
 
+def is_int(text):
+    try:
+        int(text)
+        return True
+    except ValueError:
+        return False
+
 class ClusterGUI:
 
     def __init__(self, master):
@@ -22,7 +29,7 @@ class ClusterGUI:
         self.method = StringVar(value='rand')
         self.algorithm = StringVar(value='kmeans')
 
-        Label(master, text = "Select distance function").grid(row=0, column=0)
+        Label(master, text = "Select algorithm").grid(row=0, column=0)
         self.eucl_button = Radiobutton(master,
             text="k-means",
             variable=self.algorithm,
@@ -35,6 +42,14 @@ class ClusterGUI:
             selectcolor='red',
             value="dbscan")
         self.manh_button.grid(row=2, column=0)
+
+        Label(master, text="k:").grid(row=1, column=4)
+        self.k_entry = Entry(master)
+        self.k_entry.grid(row=2, column=4)
+
+        Label(master, text="MinPts:").grid(row=4, column=4)
+        self.min_pts_entry = Entry(master)
+        self.min_pts_entry.grid(row=5, column=4)
 
         Label(master, text = "Select distance function").grid(row=3, column=0)
         self.eucl_button = Radiobutton(master,
@@ -71,6 +86,9 @@ class ClusterGUI:
         self.filename_text = Label(master, wraplength=250)
         self.filename_text.grid(row=10, column=0)
 
+        self.error_text = Label(master, wraplength=250)
+        self.error_text.grid(row=6, column=4)
+
         self.cluster_button = Button(master, text="Cluster", command=self.clustering)
         self.cluster_button.grid(row=11, column=1)
 
@@ -79,6 +97,20 @@ class ClusterGUI:
         self.filename_text.config(text=self.filename)
 
     def clustering(self):
+        # check input validity
+        if not self.filename:
+            self.error_text.config(text="Choose a file first")
+            return
+        if self.algorithm.get() == 'kmeans' and not is_int(self.k_entry.get()):
+            self.error_text.config(text="Select k")
+            return
+        if self.algorithm.get() == 'dbscan' and not is_int(self.min_pts_entry.get()):
+            self.error_text.config(text="Select MinPts")
+            return
+
+        self.error_text.config(text="")
+        
+
         with open(self.filename, 'r') as datafile:
             reader = csv.DictReader(datafile, delimiter=';')
             data = []
@@ -89,39 +121,45 @@ class ClusterGUI:
             #pre.removeAttributes(["Att1", "Att3", "For example"])
             normalized_data = pre.normalizeData()
 
+            clustered_data = None
             k_means = kMeans()
             dbscan = DBSCAN()
-            if self.algorithm == 'kmeans':
-                data_kmeans = k_means.cluster(normalized_data, k=3, 
+
+            if self.algorithm.get() == 'kmeans':
+                clustered_data = k_means.cluster(normalized_data,
+                    k=self.k_entry.get(),
                     dist=self.dist.get(),
-                    centreMethod=self.method.get,
+                    centreMethod=self.method.get(),
                     filterKeys=['Case', 'class'])
             else:
-                data_dbscan = dbscan.cluster(normalized_data, eps=1.2,
-                    MinPts=3,
-                    dist='eucl',
+                clustered_data = dbscan.cluster(normalized_data, eps=1.2,
+                    MinPts=self.min_pts_entry.get(),
+                    dist=self.dist.get(),
                     filterKeys=['Case', 'class'])
             
             pp = pprint.PrettyPrinter(indent=2)
-            #pp.pprint(data_kmeans)
+            pp.pprint(clustered_data)
             # Cluster centres and clustered data listed in every iteration:
             #pp.pprint(k_means.iterCentres)
             #pp.pprint(k_means.iterData)
 
-            print(self.filename)
             clustWriter = ClusterImageWriter("newfile")
-            # clustWriter.
+            clustWriter.writeImage(
+                k_means.iterData[0], 
+                k_means.iterCentres[0],
+                'cluster',
+                'dist2clu',
+                "sepal_length", "sepal_width",
+                1)
 
 root = Tk()
 gui = ClusterGUI(root)
 root.mainloop()
 
 
-
 # csv output
 # valikot
 # giffin tulostus
-# loput inputit
 # preprocessingille asetukset
 
 # attribuutin valinta
