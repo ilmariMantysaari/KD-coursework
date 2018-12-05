@@ -70,7 +70,7 @@ class ClusterGUI:
 
         # method
         Label(master, text = "Select method function").grid(row=6, column=0)
-        self.rand_button = Radiobutton(master, 
+        self.rand_button = Radiobutton(master,
             text="Random",
             variable=self.method,
             selectcolor='red',
@@ -140,7 +140,7 @@ class ClusterGUI:
             if self.boxes[i].get() == 0:
                 filteredKeys.append(self.attributes[i])
             i += 1
-        
+
 
         pre = preprocessing.Preprocessing(self.data)
         #pre.removeAttributes(["Att1", "Att3", "For example"])
@@ -162,7 +162,7 @@ class ClusterGUI:
                 MinPts=self.min_pts_entry.get(),
                 dist=self.dist.get(),
                 filterKeys=filteredKeys)
-            
+
         pp = pprint.PrettyPrinter(indent=2)
         #pp.pprint(clustered_data)
 
@@ -184,8 +184,8 @@ class ClusterGUI:
             #pp.pprint(k_means.iterData)
 
             #clustWriter = ClusterImageWriter("newfile")
-            #clustWriter.writeImage(
-            #    k_means.iterData[0], 
+            #clustWriter.writeKMeansImage(
+            #    k_means.iterData[0],
             #    k_means.iterCentres[0],
             #    'cluster',
             #    'dist2clu',
@@ -206,5 +206,3 @@ root.mainloop()
     # vain numeerisia attribuutteja
 
 # näytä giffi ja kuva kun valmista
-
-

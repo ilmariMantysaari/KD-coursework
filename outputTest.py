@@ -82,15 +82,15 @@ class TestClusterOutput(unittest.TestCase):
         writer = output.ClusterImageWriter('test_output_file', 'suffix')
         self.assertEqual(writer.id, 'test_output_file_suffix')
 
-    def test_writeImage(self):
+    def test_writeKMeansImage(self):
         writer = output.ClusterImageWriter('test_output_file', 'suffix')
-        writer.writeImage(DATA_3, DATA_3_CENTERS, 'clust', 'dist', 'a', 'b', 1)
+        writer.writeKMeansImage(DATA_3, DATA_3_CENTERS, 'clust', 'dist', 'a', 'b', 1)
         outputFile = pathlib.Path(OUTPUT_1)
         self.assertTrue(outputFile.is_file())
 
-    def test_writeImages(self):
+    def test_writeKMeansImages(self):
         writer = output.ClusterImageWriter('test_output_file', 'list')
-        writer.writeImages(DATA_LIST, DATA_LIST_CENTERS, 'clust', 'dist', 'a', 'b')
+        writer.writeKMeansImages(DATA_LIST, DATA_LIST_CENTERS, 'clust', 'dist', 'a', 'b')
         outputFile1 = pathlib.Path(OUTPUT_LIST_1)
         outputFile2 = pathlib.Path(OUTPUT_LIST_2)
         self.assertTrue(outputFile1.is_file())
@@ -98,7 +98,7 @@ class TestClusterOutput(unittest.TestCase):
 
     def test_writeGif(self):
         writer = output.ClusterImageWriter('test_output_file', 'list')
-        writer.writeImages(DATA_LIST, DATA_LIST_CENTERS, 'clust', 'dist', 'a', 'b')
+        writer.writeKMeansImages(DATA_LIST, DATA_LIST_CENTERS, 'clust', 'dist', 'a', 'b')
         writer.writeGif()
         outputGif = pathlib.Path(OUTPUT_GIF)
         self.assertTrue(outputGif.is_file())

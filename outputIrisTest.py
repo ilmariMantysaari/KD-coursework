@@ -32,5 +32,5 @@ class TestClusterOutput(unittest.TestCase):
             data_kmeans = k_means.cluster(normalizedData, k=3, dist='eucl', centreMethod='rand', filterKeys=['Case', 'class'])
 
             writer = output.ClusterImageWriter('iris.csv', 'output')
-            writer.writeImages(k_means.iterData, k_means.iterCentres, 'cluster', 'dist2clu', 'petal_width', 'petal_length')
+            writer.writeKMeansImages(k_means.iterData, k_means.iterCentres, 'cluster', 'dist2clu', 'petal_width', 'petal_length')
             writer.writeGif()
