@@ -73,7 +73,7 @@ class ClusterImageWriter():
                 plt.plot(case[xAttr], case[yAttr], color=colors[safeColorI], marker='o', markersize=caseMarkerSize)
 
             # Draw cluster center last
-            plt.plot(center[xAttr], center[yAttr], color=colors[safeColorI], marker='D', markerSize=self.CENTER_SIZE, markeredgecolor='black')
+            plt.plot(center[xAttr], center[yAttr], color='whitesmoke', marker='D', markerSize=self.CENTER_SIZE, markeredgewidth=2, markeredgecolor=colors[safeColorI])
             colorI = colorI + 1
 
         # Output a file and clear the figure
