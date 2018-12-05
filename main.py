@@ -22,12 +22,15 @@ class ClusterGUI:
 
     def __init__(self, master):
         self.master = master
+        self.data = []
         self.filename = ""
 
         # distance buttons
         self.dist = StringVar(value="eucl")
         self.method = StringVar(value='rand')
         self.algorithm = StringVar(value='kmeans')
+        self.attributes = []
+        self.boxes = []
 
         Label(master, text = "Select algorithm").grid(row=0, column=0)
         self.eucl_button = Radiobutton(master,
@@ -92,9 +95,28 @@ class ClusterGUI:
         self.cluster_button = Button(master, text="Cluster", command=self.clustering)
         self.cluster_button.grid(row=11, column=1)
 
+    def get_data(self):
+        with open(self.filename, 'r') as datafile:
+            reader = csv.DictReader(datafile, delimiter=';')
+            for line in reader:
+                self.data.append(line)
+
+            self.attributes = reader.fieldnames
+            checks = []
+
+            for att in reader.fieldnames:
+                var = IntVar()
+                checks.append(var)
+                l = Checkbutton(self.master, text=att, variable=var)
+                print(var.get())
+                l.grid()
+
+            self.boxes = checks
+
     def get_filename(self):
         self.filename = askopenfilename()
         self.filename_text.config(text=self.filename)
+        self.get_data()
 
     def clustering(self):
         # check input validity
@@ -109,52 +131,54 @@ class ClusterGUI:
             return
 
         self.error_text.config(text="")
+
+        filteredKeys = []
+
+        i = 0
+
+        while i < len(self.boxes):
+            if self.boxes[i].get() == 0:
+                filteredKeys.append(self.attributes[i])
+            i += 1
         
 
-        with open(self.filename, 'r') as datafile:
-            reader = csv.DictReader(datafile, delimiter=';')
-            data = []
-            for line in reader:
-                data.append(line)
+        pre = preprocessing.Preprocessing(self.data)
+        #pre.removeAttributes(["Att1", "Att3", "For example"])
+        normalized_data = pre.normalizeData()
 
-            pre = preprocessing.Preprocessing(data)
-            #pre.removeAttributes(["Att1", "Att3", "For example"])
-            normalized_data = pre.normalizeData()
+        clustered_data = None
+        k_means = kMeans()
+        dbscan = DBSCAN()
 
-            clustered_data = None
-            k_means = kMeans()
-            dbscan = DBSCAN()
+        if self.algorithm.get() == 'kmeans':
+            clustered_data = k_means.cluster(normalized_data,
+                k=self.k_entry.get(),
+                dist=self.dist.get(),
+                centreMethod=self.method.get(),
+                filterKeys=filteredKeys)
 
-            if self.algorithm.get() == 'kmeans':
-                clustered_data = k_means.cluster(normalized_data,
-                    k=self.k_entry.get(),
-                    dist=self.dist.get(),
-                    centreMethod=self.method.get(),
-                    filterKeys=['Case', 'class'])
-
-            else:
-                clustered_data = dbscan.cluster(normalized_data, eps=1.2,
-                    MinPts=self.min_pts_entry.get(),
-                    dist=self.dist.get(),
-                    filterKeys=['Case', 'class'])
+        else:
+            clustered_data = dbscan.cluster(normalized_data, eps=1.2,
+                MinPts=self.min_pts_entry.get(),
+                dist=self.dist.get(),
+                filterKeys=filteredKeys)
             
-            pp = pprint.PrettyPrinter(indent=2)
-            pp.pprint(clustered_data)
+        pp = pprint.PrettyPrinter(indent=2)
+        #pp.pprint(clustered_data)
 
-            with open(self.algorithm.get()+".csv", "w") as outfile:
-                keysExist = False
-                csvwriter = csv.writer(outfile)
-                for line in clustered_data:
-                    keys = []
-                    values = []
-                    for key, value in line.items():
-                        keys.append(key)
-                        values.append(value)
-
-                    if not keysExist:
-                        csvwriter.writerow(keys)
-                        keysExist = True
-                    csvwriter.writerow(values)
+        with open(self.algorithm.get()+".csv", "w") as outfile:
+            keysExist = False
+            csvwriter = csv.writer(outfile)
+            for line in clustered_data:
+                keys = []
+                values = []
+                for key, value in line.items():
+                    keys.append(key)
+                    values.append(value)
+                if not keysExist:
+                    csvwriter.writerow(keys)
+                    keysExist = True
+                csvwriter.writerow(values)
             # Cluster centres and clustered data listed in every iteration:
             #pp.pprint(k_means.iterCentres)
             #pp.pprint(k_means.iterData)

@@ -33,6 +33,7 @@ class kMeans(Clustering):
         data = deepcopy(data)
         dataCollector = []
         centerCollector = []
+        print(filterKeys)
 
         # Keys (i.e values) that are ignored in classification computations (distances etc.)
         self.filterKeys.extend(filterKeys)
