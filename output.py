@@ -83,7 +83,7 @@ class ClusterImageWriter():
         plt.xlabel(xAttr)
         plt.savefig(fileName, format='png')
         plt.clf()
-        return
+        return fileName
 
     # COMBINE ALL IMAGES MADE BY THIS WRITER TO A GIF
     def writeGif(self):

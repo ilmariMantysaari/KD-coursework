@@ -10,6 +10,7 @@ import pprint
 import copy
 import csv
 from output import ClusterImageWriter
+from PIL import ImageTk, Image
 
 def is_int(text):
     try:
@@ -87,10 +88,14 @@ class ClusterGUI:
         self.filename_text.grid(row=10, column=0)
 
         self.error_text = Label(master, wraplength=250)
-        self.error_text.grid(row=6, column=4)
+        self.error_text.grid(row=8, column=4)
 
         self.cluster_button = Button(master, text="Cluster", command=self.clustering)
         self.cluster_button.grid(row=11, column=1)
+
+        self.image_frame = Label(master)
+        self.image_frame.grid(row=1, column=6)
+
 
     def get_filename(self):
         self.filename = askopenfilename()
@@ -127,7 +132,7 @@ class ClusterGUI:
 
             if self.algorithm.get() == 'kmeans':
                 clustered_data = k_means.cluster(normalized_data,
-                    k=self.k_entry.get(),
+                    k=int(self.k_entry.get()),
                     dist=self.dist.get(),
                     centreMethod=self.method.get(),
                     filterKeys=['Case', 'class'])
@@ -137,20 +142,24 @@ class ClusterGUI:
                     dist=self.dist.get(),
                     filterKeys=['Case', 'class'])
             
-            pp = pprint.PrettyPrinter(indent=2)
-            pp.pprint(clustered_data)
+            # pp = pprint.PrettyPrinter(indent=2)
+            # pp.pprint(clustered_data)
             # Cluster centres and clustered data listed in every iteration:
             #pp.pprint(k_means.iterCentres)
             #pp.pprint(k_means.iterData)
 
-            clustWriter = ClusterImageWriter("newfile")
-            clustWriter.writeImage(
+            # Create imagefile and show image in UI
+            imagefile = "newfile"
+            clustWriter = ClusterImageWriter(imagefile)
+            finalname = clustWriter.writeImage(
                 k_means.iterData[0], 
                 k_means.iterCentres[0],
                 'cluster',
                 'dist2clu',
                 "sepal_length", "sepal_width",
                 1)
+            img = ImageTk.PhotoImage(Image.open(finalname))
+            self.image_frame.image = img
 
 root = Tk()
 gui = ClusterGUI(root)
