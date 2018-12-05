@@ -21,6 +21,9 @@ class ClusterImageWriter():
     DEFAULT_GIF_DELAY = 1
     MAX_MARKER_SIZE = 13
     MIN_MARKER_SIZE = 3
+    DBSCAN_MARKER_SIZE = 5
+    POINT_MARKER = 'o'
+    CENTER_MARKER = 'D'
     CENTER_SIZE = 7
     CENTER_COLOR = 'white'
 
@@ -74,10 +77,10 @@ class ClusterImageWriter():
 
             for case in clusterCases:
                 caseMarkerSize = self.MAX_MARKER_SIZE - ((case[distanceKey] / maxDist) * sizeRange)
-                plt.plot(case[xAttr], case[yAttr], color=color, marker='o', markersize=caseMarkerSize)
+                plt.plot(case[xAttr], case[yAttr], color=color, marker=self.POINT_MARKER, markersize=caseMarkerSize)
 
             # Draw cluster center last
-            plt.plot(center[xAttr], center[yAttr], color=self.CENTER_COLOR, marker='D', markerSize=self.CENTER_SIZE, markeredgewidth=2, markeredgecolor=color)
+            plt.plot(center[xAttr], center[yAttr], color=self.CENTER_COLOR, marker=self.CENTER_MARKER, markerSize=self.CENTER_SIZE, markeredgewidth=2, markeredgecolor=color)
             colorI = colorI + 1
 
             # Add legend
@@ -98,33 +101,32 @@ class ClusterImageWriter():
     #
     #
     #
-    def writeDBSCANImage(self, data, clusterKey, distanceKey, xAttr, yAttr, colors=DEFAULT_COLORS):
+    def writeDBSCANImage(self, data, clusterKey, xAttr, yAttr, minPts, eps, colors=DEFAULT_COLORS):
         # Don't edit original data
         dataC = copy.deepcopy(data)
-        centersC = copy.deepcopy(centers)
         clusterNames = parseClusterNames(dataC, clusterKey)
         colorI = 0
+        legends = []
+
         # Iterate through cluster names so that each cluster gets different color
         for name in clusterNames:
             clusterCases = list(filter(lambda case: case[clusterKey] == name, dataC))
-            center = list(filter(lambda cpoint: cpoint[clusterKey] == name, centersC))[0]
             safeColorI = colorI % len(colors)
-
-            # Marker size will be relative to distance from cluster center
-            maxDist = max(map(lambda case: case[distanceKey], clusterCases))
-            sizeRange = self.MAX_MARKER_SIZE - self.MIN_MARKER_SIZE
+            color = colors[safeColorI]
 
             for case in clusterCases:
-                caseMarkerSize = self.MAX_MARKER_SIZE - ((case[distanceKey] / maxDist) * sizeRange)
-                plt.plot(case[xAttr], case[yAttr], color=colors[safeColorI], marker='o', markersize=caseMarkerSize)
+                plt.plot(case[xAttr], case[yAttr], color=colors[safeColorI], marker=self.POINT_MARKER, markersize=self.DBSCAN_MARKER_SIZE)
 
-            # Draw cluster center last
-            plt.plot(center[xAttr], center[yAttr], color=self.CENTER_COLOR, marker='D', markerSize=self.CENTER_SIZE, markeredgewidth=2, markeredgecolor=colors[safeColorI])
             colorI = colorI + 1
 
+            # Add legend
+            label = name + ', n=' + str(len(clusterCases))
+            legends.append(mpatches.Patch(color=color, label=label))
+
         # Output a file and clear the figure
-        fileName = self.id + '_' + str(imgNum) + ".png"
-        plt.title("'" + self.fileName + "' - phase " + str(self.imgCounter))
+        fileName = self.id + '_DBSCAN' + ".png"
+        plt.title("'" + self.fileName + "' - DBSCAN, Minpts=" + str(minPts) + ", Eps=" + str(eps))
+        plt.legend(handles=legends)
         plt.ylabel(yAttr)
         plt.xlabel(xAttr)
         plt.savefig(fileName, format='png')
