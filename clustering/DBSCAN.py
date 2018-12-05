@@ -41,7 +41,7 @@ class DBSCAN(Clustering):
             if not (labels[point] == 0):
                 continue
             neighbours = self.getNeighbours(data, point, eps, dist)
-            if len(neighbours) < MinPts:
+            if len(neighbours) < int(MinPts):
                 labels[point] = -1
             else:
                 clusterNum += 1
@@ -65,7 +65,7 @@ class DBSCAN(Clustering):
         while i < len(searchQueue):
             point = searchQueue[i]
             neighbours = self.getNeighbours(data, point, eps, dist)
-            if len(neighbours) < MinPts:
+            if len(neighbours) < int(MinPts):
                 i += 1
                 continue
             for neighbour in neighbours:

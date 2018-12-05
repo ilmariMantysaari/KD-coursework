@@ -18,7 +18,11 @@ Output module has some tests for it. To run them write:
 ```
 python -m unittest outputTest.py
 ```
-See what kind of images clustering of the iris data produces:
+See what kind of images clustering of the iris data with K-means produces:
 ```
-python -m unittest ouputIrisTest.py
+python -m unittest irisTestKMeans.py
+```
+See what kind of an image clustering of the iris data with DSBCAN produces:
+```
+python -m unittest irisTestDBSCAN.py
 ```
