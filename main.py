@@ -19,6 +19,13 @@ def is_int(text):
     except ValueError:
         return False
 
+def is_float(text):
+    try:
+        float(text)
+        return True
+    except ValueError:
+        return False
+
 class ClusterGUI:
 
     def __init__(self, master):
@@ -55,6 +62,10 @@ class ClusterGUI:
         self.min_pts_entry = Entry(master)
         self.min_pts_entry.grid(row=5, column=4)
 
+        Label(master, text="Eps:").grid(row=7, column=4)
+        self.eps_entry = Entry(master)
+        self.eps_entry.grid(row=8, column=4)
+
         Label(master, text = "Select distance function").grid(row=3, column=0)
         self.eucl_button = Radiobutton(master,
             text="Euclidean",
@@ -68,21 +79,6 @@ class ClusterGUI:
             variable=self.dist,
             value= kMeans.DISTANCE_MANHATTAN)
         self.manh_button.grid(row=5, column=0)
-
-        # method
-        # Label(master, text = "Select method function").grid(row=6, column=0)
-        # self.rand_button = Radiobutton(master,
-        #     text="Random",
-        #     variable=self.method,
-        #     selectcolor='red',
-        #     value= kMeans.METHOD_RANDOM)
-        # self.rand_button.grid(row=7, column=0)
-        # self.dist_button = Radiobutton(master,
-        #     text="Distance",
-        #     variable=self.method,
-        #     selectcolor='red',
-        #     value= kMeans.METHOD_DISTANCE)
-        # self.dist_button.grid(row=8, column=0)
 
         self.filename_select = Button(master, text="Select file", command=self.get_filename)
         self.filename_select.grid(row=9, column=0)
@@ -111,7 +107,7 @@ class ClusterGUI:
             for att in reader.fieldnames:
                 var = IntVar()
                 checks.append(var)
-                l = Checkbutton(self.master, text=att, variable=var)
+                l = Checkbutton(self.master, text=att, variable=var, selectcolor='red')
                 print(var.get())
                 l.grid()
 
@@ -130,19 +126,22 @@ class ClusterGUI:
         if self.algorithm.get() == 'kmeans' and not is_int(self.k_entry.get()):
             self.error_text.config(text="Select k")
             return
-        if self.algorithm.get() == 'dbscan' and not is_int(self.min_pts_entry.get()):
-            self.error_text.config(text="Select MinPts")
+        if self.algorithm.get() == 'dbscan' and not is_int(self.min_pts_entry.get()) and not is_float(self.eps_entry.get()):
+            self.error_text.config(text="Select MinPts and Eps")
             return
 
         self.error_text.config(text="")
 
         filteredKeys = []
+        selectedKeys = []
 
         i = 0
 
         while i < len(self.boxes):
             if self.boxes[i].get() == 0:
                 filteredKeys.append(self.attributes[i])
+            else:
+                selectedKeys.append(self.attributes[i])
             i += 1
 
 
@@ -162,13 +161,13 @@ class ClusterGUI:
                 filterKeys=filteredKeys)
 
         else:
-            clustered_data = dbscan.cluster(normalized_data, eps=1.2,
-                MinPts=self.min_pts_entry.get(),
+            clustered_data = dbscan.cluster(normalized_data,
+                eps=float(self.eps_entry.get()),
+                MinPts=int(self.min_pts_entry.get()),
                 dist=self.dist.get(),
                 filterKeys=filteredKeys)
+            # data = dbscanner.cluster(normalizedData, 0.065, 4, 'eucl', ['Case', 'class', 'sepal_width', 'sepal_length'])
 
-        pp = pprint.PrettyPrinter(indent=2)
-        #pp.pprint(clustered_data)
 
         with open(self.algorithm.get()+".csv", "w") as outfile:
             keysExist = False
@@ -183,41 +182,24 @@ class ClusterGUI:
                     csvwriter.writerow(keys)
                     keysExist = True
                 csvwriter.writerow(values)
-            # Cluster centres and clustered data listed in every iteration:
-            #pp.pprint(k_means.iterCentres)
-            #pp.pprint(k_means.iterData)
 
             # Create imagefile and show image in UI
-            imagefile = "newfile"
+            imagefile = self.algorithm.get()
             clustWriter = ClusterImageWriter(imagefile)
-            finalname = clustWriter.writeImage(
-                k_means.iterData[0], 
-                k_means.iterCentres[0],
-                'cluster',
-                'dist2clu',
-                "sepal_length", "sepal_width",
-                1)
-            img = ImageTk.PhotoImage(Image.open(finalname))
-            self.image_frame.image = img
+            if self.algorithm.get() == 'kmeans':
+                finalname = clustWriter.writeKMeansImages(
+                    k_means.iterData, 
+                    k_means.iterCentres,
+                    'cluster',
+                    'dist2clu',
+                    selectedKeys[0], selectedKeys[1])
+                clustWriter.writeGif()
+            else:
+                clustWriter.writeDBSCANImage(clustered_data, 'cluster', selectedKeys[0], selectedKeys[1], 4, 0.07)
+            # writer.writeKMeansImages(k_means.iterData, k_means.iterCentres, 'cluster', 'dist2clu', 'petal_width', 'petal_length')
+            # img = ImageTk.PhotoImage(Image.open(finalname))
+            # self.image_frame.image = img
 
 root = Tk()
 gui = ClusterGUI(root)
 root.mainloop()
-
-
-# csv output
-# valikot
-# giffin tulostus
-# preprocessingille asetukset
-
-# attribuutin valinta
-    # vain numeerisia attribuutteja
-
-# näytä giffi
-# näytä kuva kun valmista
-# kälin kautta näkyviin output.pyn tuottamat kuvat
-
-# ks, iristestkmeans.py
-# valitse kälistä attribuutit
-
-# diat 
