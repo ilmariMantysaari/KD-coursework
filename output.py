@@ -44,10 +44,11 @@ class ClusterImageWriter():
     #              than color codes, the list is started from the beginning.
     #              https://matplotlib.org/examples/color/named_colors.html
     def writeKMeansImages(self, dataList, centersList, clusterKey, distanceKey, xAttr, yAttr, colors=DEFAULT_COLORS):
+        names = []
         for i in range(0, len(dataList)):
-            self.writeKMeansImage(dataList[i], centersList[i], clusterKey, distanceKey, xAttr, yAttr, self.imgCounter, colors)
+            names.append(self.writeKMeansImage(dataList[i], centersList[i], clusterKey, distanceKey, xAttr, yAttr, self.imgCounter, colors))
             self.imgCounter = self.imgCounter + 1
-        return
+        return names
 
     # WRITE SINGLE IMAGE
     #
@@ -95,7 +96,7 @@ class ClusterImageWriter():
         plt.xlabel(xAttr)
         plt.savefig(fileName, format='png')
         plt.clf()
-        return
+        return fileName
 
     # WRITE OUTPUT FOR A DBSCAN CLUSTERING - ONLY ONE IMAGE PER RESULT
     #
@@ -136,6 +137,7 @@ class ClusterImageWriter():
     # COMBINE ALL IMAGES MADE BY THIS WRITER TO A GIF
     def writeGif(self):
         imgFiles = glob.glob(self.id + "*.png")
+        imgFiles.sort()
         images = map(lambda file: imageio.imread(file), imgFiles)
         imageio.mimsave(self.id + "_combined.gif", images, duration=1.5)
-        return
+        return self.id + "_combined.gif"

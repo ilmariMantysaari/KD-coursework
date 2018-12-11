@@ -7,6 +7,7 @@ import preprocessing
 from clustering.kMeans import kMeans
 from clustering.DBSCAN import DBSCAN
 import pprint
+import datetime
 import copy
 import csv
 from output import ClusterImageWriter
@@ -25,6 +26,23 @@ def is_float(text):
         return True
     except ValueError:
         return False
+
+def set_image(canvas, pic):
+    canvas.width  = pic.width()
+    canvas.height = pic.height()
+    canvas.create_image(0, 0, image = pic, anchor = NW)
+    canvas.pic = pic
+
+def get_frames(filename):
+    frames = []
+    i = 0
+    while True:
+        try:
+            frames.append(PhotoImage(file=filename, format = 'gif -index %i' %(i)) )
+            i += 1
+        except:
+            break;
+    return frames
 
 class ClusterGUI:
 
@@ -92,8 +110,19 @@ class ClusterGUI:
         self.cluster_button = Button(master, text="Cluster", command=self.clustering)
         self.cluster_button.grid(row=11, column=1)
 
-        self.image_frame = Label(master)
-        self.image_frame.grid(row=1, column=6)
+        self.canvas = Canvas(self.master, width = 640, height = 480)
+        self.canvas.grid(row=1, column=5, rowspan=15)
+        self.gifcanvas = Canvas(self.master, width = 640, height = 480)
+        self.gifcanvas.grid(row=16, column=5, rowspan=15)
+        self.updater = None
+    
+    def update_gif(self, canvas, frames, index):
+        frame = frames[index]
+        index = (index + 1) % (len(frames))
+        canvas.create_image(0, 0, image = frame, anchor = NW)
+        canvas.frame = frame
+        if self.updater is not None:
+            self.updater = self.master.after(700, self.update_gif, canvas, frames, index)
 
     def get_data(self):
         with open(self.filename, 'r') as datafile:
@@ -104,12 +133,11 @@ class ClusterGUI:
             self.attributes = reader.fieldnames
             checks = []
 
-            for att in reader.fieldnames:
+            for i, att in enumerate(reader.fieldnames):
                 var = IntVar()
                 checks.append(var)
                 l = Checkbutton(self.master, text=att, variable=var, selectcolor='red')
-                print(var.get())
-                l.grid()
+                l.grid(row=i+13, column=1)
 
             self.boxes = checks
 
@@ -166,8 +194,6 @@ class ClusterGUI:
                 MinPts=int(self.min_pts_entry.get()),
                 dist=self.dist.get(),
                 filterKeys=filteredKeys)
-            # data = dbscanner.cluster(normalizedData, 0.065, 4, 'eucl', ['Case', 'class', 'sepal_width', 'sepal_length'])
-
 
         with open(self.algorithm.get()+".csv", "w") as outfile:
             keysExist = False
@@ -183,22 +209,35 @@ class ClusterGUI:
                     keysExist = True
                 csvwriter.writerow(values)
 
+            #remove old gif
+            if self.updater is not None:
+                self.master.after_cancel(self.updater)
+                self.updater = None
+
             # Create imagefile and show image in UI
-            imagefile = self.algorithm.get()
-            clustWriter = ClusterImageWriter(imagefile)
+            imagefile   = self.algorithm.get()
+            clustWriter = ClusterImageWriter(imagefile, datetime.datetime.now().strftime('%Y_%m_%d__%H_%M_%S'))
+            picname   = ""
+            gifname     = ""
             if self.algorithm.get() == 'kmeans':
-                finalname = clustWriter.writeKMeansImages(
+                names = clustWriter.writeKMeansImages(
                     k_means.iterData, 
                     k_means.iterCentres,
                     'cluster',
                     'dist2clu',
                     selectedKeys[0], selectedKeys[1])
-                clustWriter.writeGif()
+                gifname = clustWriter.writeGif()
+                picname = names.pop()
             else:
-                clustWriter.writeDBSCANImage(clustered_data, 'cluster', selectedKeys[0], selectedKeys[1], 4, 0.07)
-            # writer.writeKMeansImages(k_means.iterData, k_means.iterCentres, 'cluster', 'dist2clu', 'petal_width', 'petal_length')
-            # img = ImageTk.PhotoImage(Image.open(finalname))
-            # self.image_frame.image = img
+                picname = clustWriter.writeDBSCANImage(clustered_data, 'cluster', selectedKeys[0], selectedKeys[1], 4, 0.07)
+                gifname = clustWriter.writeGif()
+            
+            pic = PhotoImage(file = picname)
+            set_image(self.canvas, pic)
+
+            if self.updater is None:
+                self.updater = self.master.after(0, self.update_gif, self.gifcanvas, get_frames(gifname), 0)
+
 
 root = Tk()
 gui = ClusterGUI(root)
