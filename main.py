@@ -197,7 +197,7 @@ class ClusterGUI:
 
         with open(self.algorithm.get()+".csv", "w") as outfile:
             keysExist = False
-            csvwriter = csv.writer(outfile)
+            csvwriter = csv.writer(outfile, delimiter=';')
             for line in clustered_data:
                 keys = []
                 values = []
